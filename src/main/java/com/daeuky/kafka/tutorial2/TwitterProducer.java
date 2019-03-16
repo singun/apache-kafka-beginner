@@ -22,6 +22,7 @@ public class TwitterProducer {
 
 	Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
+	TwitterProducer
 
 	public TwitterProducer() {
 
