@@ -1,5 +1,6 @@
 package com.daeuky.kafka.tutorial1;
 
+import org.apache.kafka.clients.consumer.RoundRobinAssignor;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class ProducerDemoKeys {
 		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+//		properties.setProperty(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinAssignor.class.getName());
 
 		// create the producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
