@@ -42,6 +42,8 @@ public class ElasticSearchConsumer {
 		properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 		properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 		properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false"); // disable auto commit of offsets
+		properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10"); // disable auto commit of offsets
 
 		// create consumer
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(properties);
@@ -59,6 +61,7 @@ public class ElasticSearchConsumer {
 		while(true) {
 			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));// new in Kafka 2.0.0
 
+			logger.info("Received " + records.count() + " records");
 			for (ConsumerRecord<String, String> record : records) {
 				// 2 strategies
 				// kafka generic id
@@ -74,13 +77,20 @@ public class ElasticSearchConsumer {
 				).source(record.value(), XContentType.JSON);
 
 				IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-
-				logger.info(id);
+				logger.info(indexResponse.getId());
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+			}
+			logger.info("Committing offsets...");
+			consumer.commitSync();
+			logger.info("Offsets have benn committed");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 
